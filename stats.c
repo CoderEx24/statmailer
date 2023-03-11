@@ -34,3 +34,35 @@ const char* get_cpu_info()
     return buf;
 }
 
+const char* get_net_info()
+{
+    FILE *cpu_file = fopen("/proc/net/sockstat", "r");
+
+    if (!cpu_file)
+    {
+        fprintf(stderr, "failed to open /proc/net/sockstat");
+        return NULL;
+    }
+
+    const char* buf = (const char*) malloc(4 * 1024 * sizeof(char));
+    fread((void*) buf, sizeof(char), 4 * 1024, cpu_file);
+
+    return buf;
+}
+
+const char* get_dsk_info()
+{
+    FILE *cpu_file = fopen("/proc/diskstats", "r");
+
+    if (!cpu_file)
+    {
+        fprintf(stderr, "failed to open /proc/diskstats");
+        return NULL;
+    }
+
+    const char* buf = (const char*) malloc(6 * 1024 * sizeof(char));
+    fread((void*) buf, sizeof(char), 6 * 1024, cpu_file);
+
+    return buf;
+}
+
