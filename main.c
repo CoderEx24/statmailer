@@ -1,6 +1,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "stats.h"
 
@@ -55,16 +56,16 @@ int main()
             const char* net_info = get_net_info();
             const char* dsk_info = get_dsk_info();
 
-            if (write_file("mem", dir_name, i, mem_info, 4 * 1024) < 0)
+            if (write_file("mem", dir_name, i, mem_info, strlen(mem_info)) < 0)
                 perror("failed to write to memfile");
 
-            if (write_file("cpu", dir_name, i, cpu_info, 20 * 1024) < 0)
+            if (write_file("cpu", dir_name, i, cpu_info, strlen(cpu_info)) < 0)
                 perror("failed to write to cpufile");
             
-            if (write_file("net", dir_name, i, net_info, 4 * 1024) < 0)
+            if (write_file("net", dir_name, i, net_info, strlen(net_info)) < 0)
                 perror("failed to write to netfile");
             
-            if (write_file("dsk", dir_name, i, dsk_info, 6 * 1024) < 0)
+            if (write_file("dsk", dir_name, i, dsk_info, strlen(dsk_info)) < 0)
                 perror("failed to write to diskfile");
 
             free((void*) mem_info);
