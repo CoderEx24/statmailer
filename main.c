@@ -4,10 +4,11 @@
 
 #include "stats.h"
 
-int write_mem_file(const char* tempdir, int i, const char* buf, size_t bufsize)
+int write_file(const char* kind, const char* tempdir, int i, const char* buf, size_t bufsize)
 {
     char* filename = (char*) malloc(128 * sizeof(char));
-    snprintf(filename, 128, "%s/mem%i.txt", tempdir, i);
+    snprintf(filename, 128, "%s/%s%i.txt", tempdir, kind, i);
+    printf("will write to %s", filename);
 
     FILE *mem_file = fopen((const char*) filename, "w");
 
@@ -52,12 +53,17 @@ int main()
         for (int i = 0;; i ++)
         {
             const char* mem_info = get_mem_info();
+            const char* cpu_info = get_cpu_info();
 
-            if (write_mem_file(dir_name, i, mem_info, 4 * 1024) < 0)
+            if (write_file("mem", dir_name, i, mem_info, 4 * 1024) < 0)
                 perror("failed to write to memfile");
 
+            if (write_file("cpu", dir_name, i, cpu_info, 20 * 1024) < 0)
+                perror("failed to write to cpufile");
+
             free((void*) mem_info);
-            mem_info = NULL;
+            free((void*) cpu_info);
+            cpu_info = mem_info = NULL;
 
             sleep(60);
         }
