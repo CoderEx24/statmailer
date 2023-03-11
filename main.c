@@ -1,3 +1,5 @@
+#include <sys/wait.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -9,7 +11,6 @@ int write_file(const char* kind, const char* tempdir, int i, const char* buf, si
 {
     char* filename = (char*) malloc(128 * sizeof(char));
     snprintf(filename, 128, "%s/%s%i.txt", tempdir, kind, i);
-    printf("will write to %s", filename);
 
     FILE *mem_file = fopen((const char*) filename, "w");
 
@@ -74,7 +75,42 @@ int main()
             free((void*) dsk_info);
             dsk_info = net_info = cpu_info = mem_info = NULL;
 
-            sleep(60);
+            if (i == 12 * 60)
+            {
+                // 12 hours have passed, send email
+                
+                // create archive file
+                pid_t archive_process = fork();
+
+                if (archive_process < 0)
+                    perror("Failed to fork");
+
+                else if (archive_process == 0)
+                {
+                    char *archive_path = (char*) malloc(512);
+                    snprintf(archive_path, 512, "%s/archive.7z", dir_name);
+                    char *argv[5] = { "7z", "a", archive_path, dir_name, NULL };
+
+                    execvp("7z", argv);
+                }
+                else
+                {
+                    int ret;
+                    while(wait(&ret) != archive_process);
+
+                    if (ret != 0)
+                    {
+                        perror("failed to create archive");
+
+                        i--;
+                        continue;
+                    }
+
+                    i = 0;
+                }
+
+            }
+            sleep(2);
         }
 
     }
